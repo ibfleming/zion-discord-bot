@@ -1,7 +1,7 @@
 # Multi-stage build for optimized image size and build time
 
 # Builder stage: Install dependencies and Python packages
-FROM python:3.13.7-slim AS builder
+FROM python:3.14.0-slim AS builder
 
 # Install build dependencies for Python packages with C extensions
 RUN apt-get update && apt-get install -y \
@@ -20,7 +20,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Runtime stage: Minimal image for running the bot
-FROM python:3.13.7-slim
+FROM python:3.14.0-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
