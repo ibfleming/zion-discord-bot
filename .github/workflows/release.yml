@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,13 +53,13 @@ jobs:
           generate_release_notes: true
           body: |
             ## Docker Images
-            
+
             Pull the new version:
             ```bash
             docker pull ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.version }}
             docker pull ${{ env.DOCKER_IMAGE }}:latest
             ```
-            
+
             ## What's Changed
             See the changes below.
         env:
