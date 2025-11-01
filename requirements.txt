@@ -1,5 +1,5 @@
 discord.py[voice]~=2.6.4
-pynacl~=1.6
+pynacl~=1.5
 python-dotenv~=1.2
 yt-dlp==2025.10.22
 loguru~=0.7
