@@ -53,6 +53,9 @@ class Music(commands.Cog):
                     if not e
                     else logger.error(f"Player error: {e}")
                 ),
+                signal_type="music",
+                bitrate=192,
+                fec=True,
             )
             await ctx.send(f"🎶 Now playing: {player.title}")
             logger.info(f"Now playing: {player.title}")

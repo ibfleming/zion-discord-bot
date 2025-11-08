@@ -13,7 +13,7 @@ if not DISCORD_TOKEN:
     exit(1)
 
 YTDL_FORMAT_OPTIONS = {
-    "format": "bestaudio/best",
+    "format": "bestaudio[acodec=opus]/bestaudio/best",
     "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
     "restrictfilenames": True,
     "noplaylist": True,
@@ -25,8 +25,15 @@ YTDL_FORMAT_OPTIONS = {
     "default_search": "auto",
     "source_address": "0.0.0.0",
     "live_chunk_size": 10,
+    "prefer_ffmpeg": True,
+    "extractor_args": {
+        "youtube": {
+            "player_client": ["ios", "android"],
+        }
+    },
 }
 
 FFMPEG_OPTIONS = {
-    "options": "-vn -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -buffer_size 1024000 -probesize 1000000 -rw_timeout 5000000",
+    "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
+    "options": "-vn -b:a 192k",
 }

@@ -1,8 +1,19 @@
 services:
+  bgutil-provider:
+    container_name: bgutil-pot-provider
+    image: brainicism/bgutil-ytdlp-pot-provider:latest
+    restart: unless-stopped
+    ports:
+      - "4416:4416"
+    init: true
+
   zion-bot:
     container_name: zion-discord-bot
     image: docker.io/ibfleming/zion-discord-bot:latest
     restart: unless-stopped
+    depends_on:
+      - bgutil-provider
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - TZ=America/Los_Angeles
+    init: true
