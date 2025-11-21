@@ -1,7 +1,82 @@
 [project]
 name = "zion_discord_bot"
-dynamic = ["version"]
+version = "0.0.0" # Managed by semantic-release
 description = "A Discord bot for Zion server"
 requires-python = ">=3.13"
 readme = "README.md"
 license-files = ["LICENSE"]
+dependencies = [
+    "discord.py[voice]~=2.6.4",
+    "pynacl>=1.5.0,<1.6",
+    "python-dotenv~=1.2",
+    "yt-dlp==2025.10.22",
+    "bgutil-ytdlp-pot-provider==1.2.2",
+    "loguru~=0.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "python-semantic-release>=9.0.0",
+    "ruff>=0.8.0",
+    "safety>=3.0.0",
+    "bandit>=1.8.0",
+]
+test = ["pytest~=9.0"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+version_variables = ["src/__version__.py:__version__"]
+branch = "main"
+upload_to_vcs_release = true
+upload_to_pypi = false
+build_command = "echo 'No build required'"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "ops",
+    "perf",
+    "style",
+    "refactor",
+    "test",
+]
+major_tags = ["breaking"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+
+[tool.semantic_release.changelog]
+template_dir = "templates"
+changelog_file = "CHANGELOG.md"
+exclude_commit_patterns = []
+
+[tool.semantic_release.changelog.environment]
+block_start_string = "{%"
+block_end_string = "%}"
+variable_start_string = "{{"
+variable_end_string = "}}"
+comment_start_string = "{#"
+comment_end_string = "#}"
+trim_blocks = false
+lstrip_blocks = false
+newline_sequence = "\n"
+keep_trailing_newline = false
+extensions = []
+autoescape = true
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.remote]
+name = "origin"
+type = "github"
+ignore_token_for_push = false
+
+[tool.semantic_release.publish]
+dist_glob_patterns = ["dist/*"]
+upload_to_vcs_release = true

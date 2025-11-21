@@ -13,11 +13,11 @@ RUN apt-get update && apt-get install -y \
 # Set working directory for builder
 WORKDIR /build
 
-# Copy requirements first to leverage Docker layer caching
-COPY requirements.txt .
+# Copy pyproject.toml to leverage Docker layer caching
+COPY pyproject.toml .
 
 # Install Python dependencies system-wide
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir .
 
 # Runtime stage: Minimal image for running the bot
 FROM python:3.14.0-slim

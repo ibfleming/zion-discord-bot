@@ -1,16 +1,18 @@
-name: Release
+name: Docker Release
 
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
+  repository_dispatch:
+    types: [semantic-release]
 
 env:
   DOCKER_IMAGE: ibfleming/zion-discord-bot
 
 jobs:
-  release:
-    name: Build & Release
+  docker-release:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,11 +21,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.client_payload.tag || github.ref }}
 
       - name: Extract version from tag
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            VERSION="${{ github.event.client_payload.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
@@ -47,12 +55,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Create GitHub Release
+      - name: Add Docker info to release (tag push only)
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
+          append_body: true
           body: |
-            ## Docker Images
+
+            ---
+
+            ## 🐳 Docker Images
 
             Pull the new version:
             ```bash
@@ -60,7 +72,12 @@ jobs:
             docker pull ${{ env.DOCKER_IMAGE }}:latest
             ```
 
-            ## What's Changed
-            See the changes below.
+            ### Quick Start
+            ```bash
+            docker run -d \
+              --name zion-bot \
+              -e DISCORD_TOKEN=your_token_here \
+              ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.version }}
+            ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

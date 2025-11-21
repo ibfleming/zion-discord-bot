@@ -22,7 +22,7 @@ main() {
 }
 
 #######################################
-# Installs Python dependencies from requirements.txt
+# Installs Python dependencies from pyproject.toml
 # Globals:
 #   None
 # Arguments:
@@ -40,23 +40,23 @@ install_dependencies() {
         return 1
     fi
 
-    # Find the git repository root and locate requirements.txt
+    # Find the git repository root and locate pyproject.toml
     local repo_root
     if ! repo_root="$(git rev-parse --show-toplevel)"; then
         log_error "Could not find git repository root"
         return 1
     fi
 
-    local requirements_file="${repo_root}/requirements.txt"
+    local pyproject_file="${repo_root}/pyproject.toml"
 
-    if [[ -f $requirements_file ]]; then
-        log_info "Installing requirements from $requirements_file..."
-        if ! python3 -m pip install -r "$requirements_file"; then
-            log_error "Failed to install requirements from $requirements_file"
+    if [[ -f $pyproject_file ]]; then
+        log_info "Installing dependencies from $pyproject_file..."
+        if ! python3 -m pip install -e "${repo_root}[dev,test]"; then
+            log_error "Failed to install dependencies from $pyproject_file"
             return 1
         fi
     else
-        log_error "Requirements file not found at $requirements_file"
+        log_error "pyproject.toml not found at $pyproject_file"
         return 1
     fi
 

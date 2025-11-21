@@ -1,0 +1,85 @@
+name: Validate Commits
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  validate-commits:
+    name: Validate Commit Messages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR title follows Conventional Commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            docs
+            style
+            refactor
+            test
+            build
+            ci
+            chore
+            ops
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            doesn't start with an uppercase character.
+          validateSingleCommit: false
+
+      - name: Comment on PR with guidelines
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ⚠️ Commit Message Validation Failed
+
+            Your PR title doesn't follow the [Conventional Commits](https://www.conventionalcommits.org/) format.
+
+            ### Required Format
+            \`\`\`
+            <type>(<scope>): <description>
+            \`\`\`
+
+            ### Examples
+            - \`feat(music): add playlist support\`
+            - \`fix(queue): resolve race condition\`
+            - \`docs: update README\`
+            - \`chore(deps): update dependencies\`
+
+            ### Valid Types
+            - \`feat\`: New feature (minor version bump)
+            - \`fix\`: Bug fix (patch version bump)
+            - \`perf\`: Performance improvement (patch version bump)
+            - \`docs\`: Documentation (no version bump)
+            - \`style\`: Formatting (no version bump)
+            - \`refactor\`: Code refactoring (no version bump)
+            - \`test\`: Tests (no version bump)
+            - \`build\`: Build system (no version bump)
+            - \`ci\`: CI/CD (no version bump)
+            - \`ops\`: Infrastructure/deployment (no version bump)
+            - \`chore\`: Maintenance (no version bump)
+
+            ### Breaking Changes
+            Add \`!\` after the type for major version bumps:
+            - \`feat!: remove deprecated API\`
+
+            See [docs/SEMANTIC_RELEASE.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/docs/SEMANTIC_RELEASE.md) for more details.`
+            })
