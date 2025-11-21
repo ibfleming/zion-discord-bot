@@ -68,6 +68,7 @@ jobs:
 
             # Create GitHub release with changelog
             semantic-release publish
+          fi
 
       - name: Summary
         if: steps.release.outputs.released == 'true'
